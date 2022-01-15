@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+
+        body{
+
+        	background-color: lightgrey;
+
+        }
+
+        h1,h4,h2{
+          color: black;
+        }
+
+		code{
+			color: blueviolet;
+			font-weight: bold;	
+		}
+		ul{
+			list-style-type: none;
+			font-weight: bold;
+		}
+
+		a{
+           text-decoration: none;
+           color: darkred;
+
+		}
+
+		.Container{
+			width: 70%;
+			margin-left: 15%;
+		}
+	</style>
+</head>
+<body>
+<div class="Container">
+	<h1 style="text-align: center;">ASP.NET Web Application(.NET Framework)(C#) and WCF Service Application(C#)</h1>
+
+
+
+
+<div id="fetch">
+	<h1>#fetching data from a database</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h4>Service1.svc.cs</h4><code>
+	//we have a file called Akatsuki_link_SQL.dbml
+Akatsuki_link_SQLDataContext db = new Akatsuki_link_SQLDataContext();
+   
+    //our table name in the db is goods
+public List< Good> getGoodsList(){
+
+	var LI = new List< Good>();
+
+	dynamic DBL = (from m in db.Goods select m);
+	//dynamic DBL = (from m in db.Goods select m).FirstOrDefault();
+
+	foreach(Good i in DBL)
+	{
+          LI.add(i);
+	}
+
+	return LI;
+}
+</code>
+<h4>ProductList.aspx</h4><code>
+< div id="productList" runat="server">
+
+< /div>
+</code>
+<h4>ProductList.aspx.cs</h4><code>
+Service1Client client = new Service1Client();
+
+Protected void Page_Load(.....){
+   
+   var Goods = client.getGoodsList();
+   String display ="";
+
+   foreach(Good good in Goods){
+
+   	 display += "< h3>";
+   	  display += good.price;
+   	 display += "< /h3>";
+   }
+
+   productList.InnerHtml = display;
+}
+</code>
+</pre>
+</div>
+
+<div id="add">
+	<h1>#adding data to a database</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h4>Service1.svc.cs</h4><code>
+	//we have a file called Akatsuki_link_SQL.dbml
+Akatsuki_link_SQLDataContext db = new Akatsuki_link_SQLDataContext();
+   
+public bool RegUser(String name,String email){
+     //new user
+     //our table name is Users
+     var NewUser = new User{
+     	 Name//db variable = name;
+     	 Email = email;
+     };
+
+     db.Users.InsertOnSubmit(NewUser);
+
+     try{
+     	 db.SubmitChanges();
+     	 return true;
+     }catch(Exception ex){
+       ex.GetBaseException();
+       return false;
+     }
+}
+</code>
+<h4>SignUp.aspx</h4><code>
+< form runat="server">
+  < input name="name" id="name" runat="server" />
+  < input name="email" id="email" runat="server" />
+  < asp:Button ID="signup" runat="server" Text="register" Onclick="signup_click" />
+< /form>
+</code>
+<h4>SignUp.aspx.cs</h4><code>
+Service1Client client = new Service1Client();
+
+Protected void signup_click(Object sender,EventArgs e){
+   
+   bool isReg = client.RegUser(name.Value,email.Value);
+
+   if(isReg == true){
+   	 Response.Redirect("SignIn.aspx");//redirect to another page
+   }
+
+}
+</code>
+</pre>
+</div>
+
+
+
+
+<div id="sql">
+	<h1>#SQL example</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<code>
+//creating a table called person
+Create Table [dbo].[Person]{
+	[PName] varchar(30) not null,
+	[PstudentNum] numeric(1) not null,
+	[ID] numeric(1) not null Primary Key,
+}
+
+</code>
+</pre>
+</div>
+
+
+
+
+<div id="fetchAdvanced">
+	<h1>#advanced way of fetching data</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h4>Service1.svc.cs</h4><code>
+	//we have a file called Akatsuki_link_SQL.dbml
+Akatsuki_link_SQLDataContext db = new Akatsuki_link_SQLDataContext();
+   
+    //our table name in the db is Items
+public Item getMenuItem(int ID){
+
+	dynamic MI = (from m in db.Items where m.Id.Equals(ID) select m).FirstOrDefault();
+	return MI;
+}
+
+public int login(String email,String password){
+
+	dynamic user = (from u in db.Users where u.Email.Equals(email)&&u.password.Equals(passowrd) select u).FirstOrDefault();
+
+	return user.Id; 
+}
+</code>
+<h4>login.aspx.cs</h4><code>
+Service1Client client = new Service1Client();
+
+Protected void btnLogin_click(.....){
+   
+   var loguser = client.login(email.Value,Password.Value);
+
+   if(loguser != null){
+     //session variable is nothing but a variable thats available for a certain period
+   	Session["userID"] = loguser;
+   	Response.Redirects("Home.aspx");
+    
+   }
+
+}
+
+
+
+<h4>//parsing a string into an int or decimal</h4>
+Int32.Parse("string")
+Decimal.Parse("string")
+</code>
+</pre>
+</div>
+
+
+
+
+
+
+
+<div id="url">
+	<h1>#fetching data from url parameters</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h4>login.aspx</h4><code>
+< a href="GetPerson.aspx?PID=46">forgot password?< /a>
+</code>
+
+<h4>GetPerson.cs</h4><code>
+String ID = "";
+ID = Request.QueryString["PID"]; 
+</code>
+</pre>
+</div>
+
+
+
+
+
+<div id="update">
+	<h1>#updating a database</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h4>school.svc.cs</h4><code>
+public bool updateDonations(String email,String amount){
+
+      decimal total = 0.0;
+      dynamic data = (from m in db.Donations select m);//we can simplify the process by adding a where m.Email.Equals(email)
+
+      foreach(Donation row in data){
+        
+        if(row != null){
+        	total = row.DonationAmount+newAmount;
+        	row.DonationAmount = total;
+        }
+      }
+
+      try{
+      	db.submitChanges();
+      	return true;
+      }catch(Exception e){
+      	e.GetBaseException();
+      	return false;
+      }
+
+}
+
+</code>
+
+</pre>
+</div>
+
+
+
+
+
+
+<div id="delete">
+	<h1>#deleting a database row</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h4>school.svc.cs</h4><code>
+public bool deleteDonations(String email){
+
+      
+      dynamic data = (from m in db.Donations select m);//we can simplify the process by adding a where m.Email.Equals(email)
+
+      foreach(Donation row in data){
+        
+        if(row != null){
+        	 db.Donations.DeleteOnSubmit(row)
+        }
+      }
+
+      try{
+      	db.submitChanges();
+      	return true;
+      }catch(Exception e){
+      	e.GetBaseException();
+      	return false;
+      }
+
+}
+
+</code>
+
+</pre>
+</div>
+
+
+
+
+<div id="hashing">
+	<h1>#hashing a password</h1>
+	
+<pre style="background: whitesmoke; padding: 20px;border-radius: 12px;">
+<h5>using System.Security.Cryptography;</h5>	
+<h4>Secrecy.cs</h4><code>
+namespace HashPass{
+
+	Public static String HashPassword(String password){
+		
+		SHA1 algorithm = SHA1.Create();
+		byte[] byteArray = null;
+		byteArray = algorithm.ComputeHash(Encoding.Default.GetBytes(password));
+
+		String hashedPassword = "";
+
+		for(int i=0;i < byteArray.length ;i++){
+			hashedPassword+= byteArray[i].ToString('x2');
+		}
+
+		return hashedPassword;
+	}
+}
+
+</code>
+
+
+<h4>signup.aspx.cs</h4><code>
+var has = Secrecy.HashPassword(password.Value);
+
+
+</code>
+
+</pre>
+</div>
+
+
+</div>
+
+</body>
+</html>
